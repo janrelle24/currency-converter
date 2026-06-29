@@ -16,10 +16,12 @@ function App() {
     const fetchCurrencies = async () => {
       try{
         const response = await axios.get(
-          `[v6.exchangerate-api.com](https://v6.exchangerate-api.com/v6/${API_KEY}/codes)`
+          `https://v6.exchangerate-api.com/v6/${API_KEY}/codes`
         );
-        setCurrencies(response.data.supported_codes);
+        console.log(response.data);
+        setCurrencies(response.data.supported_codes || []);
       }catch (err){
+        console.error(err);
         setError('Failed to load currencies');
       }
     };
@@ -31,10 +33,11 @@ function App() {
     setError(null);
     try {
       const response = await axios.get(
-        `[v6.exchangerate-api.com](https://v6.exchangerate-api.com/v6/${API_KEY}/pair/${fromCurrency}/${toCurrency}/${amount})`
+        `https://v6.exchangerate-api.com/v6/${API_KEY}/pair/${fromCurrency}/${toCurrency}/${amount}`
       );
       setResult(response.data.conversion_result);
     } catch (err) {
+      console.error(err);
       setError('Conversion failed. Please try again.');
     } finally {
       setLoading(false);
@@ -67,10 +70,11 @@ function App() {
             value={fromCurrency}
             onChange={(e) => setFromCurrency(e.target.value)}
           >
-            {currencies.map(([code, name]) => (
-              <option key={code} value={code}>
-                {code} - {name}
-              </option>
+            {Array.isArray(currencies) &&
+              currencies.map(([code, name]) => (
+                <option key={code} value={code}>
+                  {code} - {name}
+                </option>
             ))}
           </select>
         </div>
