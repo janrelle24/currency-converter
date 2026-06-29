@@ -10,6 +10,9 @@ function App() {
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [currentTime, setCurrentTime] = useState(new Date);
+  const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const formattedTime = currentTime.toLocaleTimeString();
   const API_KEY = import.meta.env.VITE_API_KEY;
   // Fetch available currencies on mount
   useEffect(()=>{
@@ -27,6 +30,7 @@ function App() {
     };
     fetchCurrencies();
   }, [API_KEY]);
+
   // Convert currency
   const handleConvert = async () => {
     setLoading(true);
@@ -49,11 +53,29 @@ function App() {
     setToCurrency(fromCurrency);
     setResult(null);
   };
+  //updates the displayed time every second
+  useEffect(() => {
+    const timer = setInterval(() =>{
+      setCurrentTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  });
+  const formattedDate = currentTime.toLocaleDateString(undefined, {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
 
   return (
     <div className="converter">
       <h1>Currency Converter</h1>
-      
+      <div className="date-time">
+        <p>{formattedDate}</p>
+        <p>{formattedTime}</p>
+        <small>{timeZone}</small>
+      </div>
       <div className="input-group">
         <label>Amount</label>
         <input
